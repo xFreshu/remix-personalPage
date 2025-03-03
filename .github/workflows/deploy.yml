@@ -18,23 +18,20 @@ jobs:
           PI_USER: pi
           PI_HOST: ${{ secrets.PI_HOST }}
         run: |
+          eval $(ssh-agent -s)
+
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
           ssh-keyscan -H "$PI_HOST" >> ~/.ssh/known_hosts
-          
+
           ssh $PI_USER@$PI_HOST << 'EOF'
-            set -e  # Stop jeśli wystąpi błąd
+            set -e
             cd ~/app
-          
-            git fetch origin main
-            if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
-              echo "Zmiany wykryte, wdrażanie..."
-              git pull origin main
-              npm install --production
-              npm run build
-              pm2 restart app || pm2 start npm --name "app" -- start
-              echo "Deployment zakończony!"
-            else
-              echo "Brak zmian, deployment pominięty."
-            fi
+            git pull origin main
+            npm install --production
+            npm run build
+            pm2 restart app || pm2 start npm --name "app" -- start
           EOF
+      
