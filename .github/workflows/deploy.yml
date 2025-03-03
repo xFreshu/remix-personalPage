@@ -15,18 +15,24 @@ jobs:
       - name: Setup SSH and deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
-          PI_USER: pi
+          PI_USER: ubuntu
           PI_HOST: ${{ secrets.PI_HOST }}
         run: |
+          # Uruchomienie ssh-agent
           eval $(ssh-agent -s)
           
+          # Utworzenie katalogu ~/.ssh, jeśli nie istnieje
           mkdir -p ~/.ssh
           
-          set -e
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - || { echo "Failed to add SSH key"; exit 1; }
+          # Poprawne przekazanie klucza
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-add ~/.ssh/deploy_key
           
+          # Zaufanie do hosta
           ssh-keyscan -H "$PI_HOST" >> ~/.ssh/known_hosts
           
+          # SSH do Raspberry Pi i deployment
           ssh $PI_USER@$PI_HOST << 'EOF'
             set -e
             cd ~/app
