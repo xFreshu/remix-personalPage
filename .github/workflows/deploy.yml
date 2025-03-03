@@ -12,17 +12,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Deploy to Raspberry Pi
+      - name: Setup SSH and deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
           PI_USER: pi
           PI_HOST: ${{ secrets.PI_HOST }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key $PI_USER@$PI_HOST << 'EOF'
-            cd /home/pi/app
-            git pull origin main
-            npm install
-            npm run build
-            pm2 restart app
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+          ssh-keyscan -H "$PI_HOST" >> ~/.ssh/known_hosts
+          
+          ssh $PI_USER@$PI_HOST << 'EOF'
+            set -e  # Stop jeśli wystąpi błąd
+            cd ~/app
+          
+            git fetch origin main
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
+              echo "Zmiany wykryte, wdrażanie..."
+              git pull origin main
+              npm install --production
+              npm run build
+              pm2 restart app || pm2 start npm --name "app" -- start
+              echo "Deployment zakończony!"
+            else
+              echo "Brak zmian, deployment pominięty."
+            fi
           EOF
