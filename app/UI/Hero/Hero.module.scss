@@ -1,12 +1,109 @@
-@use '../../styles/variables' as *;
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-color: black;
+  color: #F5F5E9;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  overflow: hidden;
+}
 
-.hero{
-  h1{
-    font-size: $font-size-h1;
-    font-weight: 500;
+.navigationSection{
+  display: flex;
+  width: 100%;
+  padding: 20px;
+  font-size: 1vw;
+  text-align: left;
+  div{
+    text-align: right;
   }
-  h2{
-    font-size: $font-size-h2;
-    font-weight: 300;
+  nav{
+    margin: auto;
+    li{
+
+      list-style: none;
+    }
+  }
+}
+
+.marqueeWrapper {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  position: absolute;
+  top: 35%;
+}
+
+.marquee {
+  display: flex;
+  gap: 5vw;
+  width: max-content;
+  animation: marqueeMove 10s linear infinite;
+}
+
+@keyframes marqueeMove {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.33%);
+  }
+}
+
+.bigText {
+  font-size: 10vw;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.separator {
+  padding: 0 1vw;
+}
+
+.subtext {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1vw;
+  width: 100vw;
+  text-transform: uppercase;
+  margin: 10px 0;
+  padding: 20px;
+}
+
+.subtext p {
+  text-align: left;
+}
+
+.textLeft {
+  text-align: left;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.textRight {
+  text-align: right;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .subtext {
+    flex-direction: column;
+    align-items: center;
+    font-size: 3vw;
+    text-align: center;
+  }
+
+  .textLeft,
+  .textCenter,
+  .textRight {
+    text-align: center;
+    margin-bottom: 10px;
   }
 }
