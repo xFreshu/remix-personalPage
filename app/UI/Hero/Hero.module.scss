@@ -1,3 +1,5 @@
+@use '../../styles/variables' as *;
+
 .hero {
   position: relative;
   width: 100%;
@@ -6,7 +8,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
+  background-color: $background;
   color: #F5F5E9;
   font-family: 'Arial', sans-serif;
   text-align: center;
